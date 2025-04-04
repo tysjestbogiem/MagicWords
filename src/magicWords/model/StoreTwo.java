@@ -1,5 +1,8 @@
 package magicWords.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StoreTwo<T, C> {
     private T magicWord;
     private C category;
@@ -8,6 +11,8 @@ public class StoreTwo<T, C> {
         this.magicWord = magicWord;
         this.category = category;
     }
+    
+    ArrayList<StoreTwo<String, MagicLevel>> magicList = new ArrayList<StoreTwo<String, MagicLevel>>(); 
 
     public T getMagicWord() {
         return magicWord;
@@ -23,6 +28,11 @@ public class StoreTwo<T, C> {
 
     public void setCategory(C category) {
         this.category = category;
+    }
+    
+    public String toString() {
+		return magicWord.toString(); //all method toString() directly, no need for casting
+    	
     }
 }
 

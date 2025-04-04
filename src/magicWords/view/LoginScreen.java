@@ -68,6 +68,8 @@ public class LoginScreen extends JFrame {
 		contentPane.add(txtMagicWord);
 		txtMagicWord.setColumns(10);
 		
+		// when someone clicks "Enter", check if the input is not empty
+		// then let the controller decide what to do
 		JButton btnEnter = new JButton("ENTER");
 		btnEnter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -75,21 +77,24 @@ public class LoginScreen extends JFrame {
 				boolean result = validateInput();
 				
 				if (result == true) {
-					
+					// check if the magic word is valid and open the correct screen
 					result = myController.isMagicWordCorrect(txtMagicWord.getText());
 					
 					if (result) {
 						//mission accomplished, I have nothing else to do, move to diffrent screen
 						dispose();
 					} else {
+						// word didn’t match anything
 						displayMessage("\"That word holds no power here.\nTry again or exit.\"");
 					}
 					
 				} else {
-					displayMessage("Enter Magic Word.");
+					displayMessage("Enter Magic Word."); // user left it blank
 				}
 			}
 		});
+		
+		// exit button – just closes the app
 		btnEnter.setBackground(new Color(255, 0, 0));
 		btnEnter.setForeground(Color.BLACK);
 		btnEnter.setFont(new Font("Courier New", Font.PLAIN, 20));
@@ -112,8 +117,8 @@ public class LoginScreen extends JFrame {
 		contentPane.add(btnExit);
 		
 	}
-	
-	// private method to validate login input exists
+
+		// this checks if the input box is empty
 		private boolean validateInput() {
 			Boolean retval = true;
 			
