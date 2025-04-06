@@ -1,9 +1,10 @@
 package magicWords.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StoreTwo<T, C> {
+public class StoreTwo<T, C> implements Serializable{
     private T magicWord;
     private C category;
 
@@ -31,7 +32,7 @@ public class StoreTwo<T, C> {
     }
     
     public String toString() {
-		return magicWord.toString(); //all method toString() directly, no need for casting
+		return magicWord.toString(); //all method toString() called directly, no need for casting
     	
     }
 }

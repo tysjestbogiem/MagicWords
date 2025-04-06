@@ -1,5 +1,10 @@
 package magicWords.model;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -21,26 +26,38 @@ public class Model {
 
 	//private ArrayList<StoreTwo> wordList = new ArrayList<>();	
 	private ArrayList<StoreTwo<String, MagicLevel>> wordList = new ArrayList<>();
-
+	private static final String FILE_NAME = "wordList.dat";
+	
 	
 	// Constructor: populates the initial list with predefined magic words
 	public Model() {
-		
-		// Adding SUPER level magic words to the list
-		wordList.add(new StoreTwo<>("thank you", MagicLevel.SUPER));
-		wordList.add(new StoreTwo<>("please", MagicLevel.SUPER));
-		wordList.add(new StoreTwo<>("I love you", MagicLevel.SUPER));
-		wordList.add(new StoreTwo<>("I'm sorry", MagicLevel.SUPER));
-		wordList.add(new StoreTwo<>("welcome", MagicLevel.SUPER));
-		
-		// Adding NORMAL level magic words to the list
-		wordList.add(new StoreTwo<>("mellon", MagicLevel.NORMAL));
-		wordList.add(new StoreTwo<>("abracadabra", MagicLevel.NORMAL));
-		wordList.add(new StoreTwo<>("hocus pocus", MagicLevel.NORMAL));
-		wordList.add(new StoreTwo<>("alohomora", MagicLevel.NORMAL));
-		wordList.add(new StoreTwo<>("shazam", MagicLevel.NORMAL));
+	    wordList = loadFromFile();
+
+	    if (wordList == null || wordList.isEmpty()) {
+	        wordList = new ArrayList<>();
+	        addInitialWords();     // ✅ only once
+	        saveToFile();          // 💾 save them immediately
+	    }
 	}
+
+		
+		
+	private void addInitialWords() {
+	    wordList.add(new StoreTwo<>("thank you", MagicLevel.SUPER));
+	    wordList.add(new StoreTwo<>("please", MagicLevel.SUPER));
+	    wordList.add(new StoreTwo<>("I love you", MagicLevel.SUPER));
+	    wordList.add(new StoreTwo<>("I'm sorry", MagicLevel.SUPER));
+	    wordList.add(new StoreTwo<>("welcome", MagicLevel.SUPER));
+
+	    wordList.add(new StoreTwo<>("mellon", MagicLevel.NORMAL));
+	    wordList.add(new StoreTwo<>("abracadabra", MagicLevel.NORMAL));
+	    wordList.add(new StoreTwo<>("hocus pocus", MagicLevel.NORMAL));
+	    wordList.add(new StoreTwo<>("alohomora", MagicLevel.NORMAL));
+	    wordList.add(new StoreTwo<>("shazam", MagicLevel.NORMAL));
+	}
+
 	
+
 	// Getter method to access the list of magic words
 	public ArrayList<StoreTwo<String, MagicLevel>>  getMagicWordList() {
 		
@@ -90,18 +107,39 @@ public class Model {
 
 	public void addNewWord(String word, MagicLevel level) {
 		wordList.add(new StoreTwo<>(word, level));
-		
+		saveToFile();
 		
 	}
 	
 	public void upgradeWord(String word) {
 	    for (StoreTwo<String, MagicLevel> entry : wordList) {
 	        if (entry.getMagicWord().equalsIgnoreCase(word)) {
-	            //entry.setCategory(MagicLevel.SUPER);  
+	            entry.setCategory(MagicLevel.SUPER);  
+	            saveToFile();
 	            break;
 	        }
 	    }
 	}
+	
+	
+
+	
+	 public void saveToFile() {
+	        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+	            out.writeObject(wordList);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    @SuppressWarnings("unchecked")
+	    public ArrayList<StoreTwo<String, MagicLevel>> loadFromFile() {
+	        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+	            return (ArrayList<StoreTwo<String, MagicLevel>>) in.readObject();
+	        } catch (IOException | ClassNotFoundException e) {
+	            return null; // no saved file found yet
+	        }
+	    }
 
 
 

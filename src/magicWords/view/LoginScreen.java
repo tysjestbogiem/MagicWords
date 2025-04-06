@@ -83,9 +83,11 @@ public class LoginScreen extends JFrame {
 					if (result) {
 						//mission accomplished, I have nothing else to do, move to diffrent screen
 						dispose();
+						txtMagicWord.setText(" ");
 					} else {
 						// word didn’t match anything
 						displayMessage("\"That word holds no power here.\nTry again or exit.\"");
+						txtMagicWord.setText(" ");
 					}
 					
 				} else {

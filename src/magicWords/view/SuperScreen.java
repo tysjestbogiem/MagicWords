@@ -12,23 +12,16 @@ import java.awt.event.ActionEvent;
 public class SuperScreen extends JFrame {
 
     private static final long serialVersionUID = 1L;
-	protected static final MagicLevel MagicLevel = null;
+	
     private JPanel contentPane;
-    private DefaultListModel<String> displayAMW; //display all magic words
     private Controller myController;
+    private DefaultListModel<String> displayAMW;
     private JList<String> allWordList;
     private JTextField txtWordCheck;
-    private Model myModel; // handles all the data and logic behind the scenes
+    private JScrollPane scrollPane;
 
-    /**
-     * Create the frame.
-     */
     public SuperScreen(String magicWord, Controller controller) {
-    	// initialise 
-    	this.myController = controller;
-    	this.myModel = controller.getModel(); 
-    	
-    	
+        this.myController = controller;
     	
     	
         setTitle("Super Wizard Screen");
@@ -67,37 +60,36 @@ public class SuperScreen extends JFrame {
         JLabel lblNewLabel_2 = new JLabel("All Magic Words:");
         lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
         lblNewLabel_2.setFont(new Font("Courier New", Font.PLAIN, 16));
-        lblNewLabel_2.setBounds(0, 296, 282, 45);
+        lblNewLabel_2.setBounds(50, 275, 282, 45);
         contentPane.add(lblNewLabel_2);
         
         JPanel panel = new JPanel();
-        panel.setBounds(0, 339, 282, 348);
+        panel.setBounds(50, 329, 282, 348);
         panel.setLayout(new BorderLayout()); 
         contentPane.add(panel);
         
         // list model that stores magic words to display
-        displayAMW = new DefaultListModel<String>();
+        displayAMW = new DefaultListModel<>();
+
+     // Fill the list from controller
+     for (String word : myController.getAllWordList()) {
+         displayAMW.addElement(word);
+     }
+     	// display the list in a scrollable panel
+	     allWordList = new JList<>(displayAMW);
+	     scrollPane = new JScrollPane(allWordList);
+	     panel.add(scrollPane, BorderLayout.CENTER);
         
-        // grab all words from controller and fill the list
-        for(int i =0; i < myController.getAllWordList().length; i++) {
-        	displayAMW.addElement(myController.getAllWordList()[i]);
-        }
-        
-        // display the list in a scrollable panel
-        allWordList = new JList<String>(displayAMW);
-        panel.add(allWordList);
-        JScrollPane scrollPane = new JScrollPane(allWordList);
-        panel.add(scrollPane, BorderLayout.CENTER);
         
         // when “Check status” is clicked, we’ll see what level a word is
         JLabel lblWordCheck = new JLabel("Check word status.");
         lblWordCheck.setHorizontalAlignment(SwingConstants.CENTER);
         lblWordCheck.setFont(new Font("Courier New", Font.PLAIN, 16));
-        lblWordCheck.setBounds(342, 296, 222, 45);
+        lblWordCheck.setBounds(453, 296, 222, 45);
         contentPane.add(lblWordCheck);
         
         txtWordCheck = new JTextField();
-        txtWordCheck.setBounds(342, 339, 222, 33);
+        txtWordCheck.setBounds(453, 340, 222, 33);
         contentPane.add(txtWordCheck);
         txtWordCheck.setColumns(10);
         
@@ -105,77 +97,43 @@ public class SuperScreen extends JFrame {
         JButton btnCheckWord = new JButton("Check status");
         btnCheckWord.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		checkWordLevel();
+        		String word = txtWordCheck.getText();
+        		myController.checkWordLevel(word);
+        		
         	}
         });
         btnCheckWord.setBackground(new Color(102, 153, 0));
         btnCheckWord.setOpaque(true);                  
         btnCheckWord.setContentAreaFilled(true);  
         btnCheckWord.setFont(new Font("Courier New", Font.PLAIN, 16));
-        btnCheckWord.setBounds(357, 400, 200, 45);
+        btnCheckWord.setBounds(453, 399, 222, 33);
         contentPane.add(btnCheckWord);
+        
+        txtWordCheck.setText(" ");
+        
+        JButton btnNewButton = new JButton("Exit to the Welcome Screen");
+        btnNewButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		dispose();
+        		myController.showLoginScreen();
+        	}
+        });
+        
+        
+        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        btnNewButton.setBounds(620, 625, 238, 33);
+        contentPane.add(btnNewButton);
+        refreshWordList(); 
        
     }
 
-
-    public void checkWordLevel() {
-
-        String word = txtWordCheck.getText();
-        MagicLevel level = this.myModel.getMagicLevel(word);
-
-        if (level == MagicLevel.SUPER) {
-            displayMessage("Word >> " + word + " << has status of SUPER MAGIC WORD");
-
-        } else if (level == MagicLevel.NORMAL) {
-            displayMessage("Word >> " + word + " << has status of NORMAL MAGIC WORD");
-
-            int response = JOptionPane.showConfirmDialog(
-                    this,
-                    "Do you want to upgrade word >> " + word + " << to SUPER MAGIC WORD?",
-                    "Upgrade Word?",
-                    JOptionPane.YES_NO_OPTION
-            );
-
-            if (response == JOptionPane.YES_OPTION) {
-                myModel.upgradeWord(word); 
-                displayMessage("Word upgraded to SUPER MAGIC WORD.");
-            }
-
-        } else {
-            displayMessage("Word >> " + word + " << has status of UNKNOWN MAGIC WORD");
-
-            int response = JOptionPane.showConfirmDialog(
-                    this,
-                    "Do you want to upgrade word >> " + word + " << ?\n"
-                            + "YES = SUPER MAGIC WORD\n"
-                            + "NO = NORMAL MAGIC WORD\n"
-                            + "CANCEL = Do not upgrade.",
-                    "Unknown Word Action",
-                    JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE
-            );
-
-            if (response == JOptionPane.YES_OPTION) {
-                myModel.addNewWord(word, MagicLevel.SUPER);  
-                refreshWordList();
-                displayMessage("New word added as SUPER MAGIC WORD.");
-            } else if (response == JOptionPane.NO_OPTION) {
-                myModel.addNewWord(word, MagicLevel.NORMAL);
-                refreshWordList();
-                displayMessage("New word added as NORMAL MAGIC WORD.");
-            } else {
-                displayMessage("No changes made to the word list.");
-            }
-        }
-    }
-
 	
-	private void displayMessage(String message) {
+	public void displayMessage(String message) {
 	    JOptionPane.showMessageDialog(this, message);
 	}
 	
 	
-	private void refreshWordList() {
+	public void refreshWordList() {
 	    displayAMW.clear();  // clear old items
 
 	    String[] allWords = myController.getAllWordList();  // get updated word list
@@ -183,6 +141,14 @@ public class SuperScreen extends JFrame {
 	        displayAMW.addElement(word);  // repopulate list model
 	    }
 	}
+	
+	public int showYesNoPrompt(String message, String title) {
+        return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_OPTION);
+    }
+
+    public int showYesNoCancelPrompt(String message, String title) {
+        return JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+    }
 
 
 }
